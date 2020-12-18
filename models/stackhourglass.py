@@ -50,22 +50,16 @@ class hourglass(nn.Module):
         return out, pre, post
 
 class PSMNet(nn.Module):
-<<<<<<< HEAD
-	def __init__(self, maxdisp):
-		super(PSMNet, self).__init__()
-		self.maxdisp = int(maxdisp)
-=======
     def __init__(self, maxdisp):
         super(PSMNet, self).__init__()
-        self.maxdisp = maxdisp
->>>>>>> parent of f056676... Correct bad import and code indentation
+        self.maxdisp = int(maxdisp)
 
         self.feature_extraction = feature_extraction()
 
         self.dres0 = nn.Sequential(convbn_3d(64, 32, 3, 1, 1),
-                                     nn.ReLU(inplace=True),
-                                     convbn_3d(32, 32, 3, 1, 1),
-                                     nn.ReLU(inplace=True))
+                                   nn.ReLU(inplace=True),
+                                   convbn_3d(32, 32, 3, 1, 1),
+                                   nn.ReLU(inplace=True))
 
         self.dres1 = nn.Sequential(convbn_3d(32, 32, 3, 1, 1),
                                    nn.ReLU(inplace=True),
@@ -141,23 +135,23 @@ class PSMNet(nn.Module):
         cost3 = self.classif3(out3) + cost2
 
         if self.training:
-		cost1 = F.upsample(cost1, [self.maxdisp,left.size()[2],left.size()[3]], mode='trilinear')
-		cost2 = F.upsample(cost2, [self.maxdisp,left.size()[2],left.size()[3]], mode='trilinear')
+            cost1 = F.upsample(cost1, [self.maxdisp,left.size()[2],left.size()[3]], mode='trilinear')
+            cost2 = F.upsample(cost2, [self.maxdisp,left.size()[2],left.size()[3]], mode='trilinear')
 
-		cost1 = torch.squeeze(cost1,1)
-		pred1 = F.softmax(cost1,dim=1)
-		pred1 = disparityregression(self.maxdisp)(pred1)
+            cost1 = torch.squeeze(cost1,1)
+            pred1 = F.softmax(cost1,dim=1)
+            pred1 = disparityregression(self.maxdisp)(pred1)
 
-		cost2 = torch.squeeze(cost2,1)
-		pred2 = F.softmax(cost2,dim=1)
-		pred2 = disparityregression(self.maxdisp)(pred2)
+            cost2 = torch.squeeze(cost2,1)
+            pred2 = F.softmax(cost2,dim=1)
+            pred2 = disparityregression(self.maxdisp)(pred2)
 
         cost3 = F.upsample(cost3, [self.maxdisp,left.size()[2],left.size()[3]], mode='trilinear')
         cost3 = torch.squeeze(cost3,1)
         pred3 = F.softmax(cost3,dim=1)
-	#For your information: This formulation 'softmax(c)' learned "similarity" 
-	#while 'softmax(-c)' learned 'matching cost' as mentioned in the paper.
-	#However, 'c' or '-c' do not affect the performance because feature-based cost volume provided flexibility.
+        #For your information: This formulation 'softmax(c)' learned "similarity" 
+        #while 'softmax(-c)' learned 'matching cost' as mentioned in the paper.
+        #However, 'c' or '-c' do not affect the performance because feature-based cost volume provided flexibility.
         pred3 = disparityregression(self.maxdisp)(pred3)
 
         if self.training:
